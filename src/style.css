@@ -1,0 +1,732 @@
+/* ============================== index.css ============================== */
+/* ==========================================================================
+   Code Bounty 2.0 — index.css
+   --------------------------------------------------------------------------
+   Tokens, reset, the horizontal scroller, buttons and the sound toggle.
+
+   The site is deliberately bare: no nav bar, no section links, no progress
+   bar, no SCROLL cue. The home page ("the bounty gate") plus one empty panel
+   are the whole thing, and it always scrolls LEFT → RIGHT.
+   ========================================================================== */
+
+:root {
+  /* palette: game UI built on a deep "level editor" navy */
+  --navy-900: #0a1520;
+  --navy-800: #0f1e2e;
+  --navy-700: #16283c;
+  --navy-600: #1d3550;
+  --navy-500: #274a6b;
+  --sky: #63b3e6;
+  --gold: #f6b73c;
+  --gold-deep: #e59a12;
+  --orange: #ff8a3d;
+  --red: #e04a3a;
+  --green: #6fc24a;
+  --wood: #b1703a;
+  --wood-dark: #7a4a1e;
+  --stone: #8d979e;
+  --glass: #9fe8ff;
+  --ink: #eaf4ff;
+  --ink-dim: #a9c4dc;
+
+  --font-display: 'Segoe UI Black', 'Arial Black', 'Helvetica Neue', Impact, system-ui, sans-serif;
+  --font-ui: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Mono', 'SF Mono', Consolas, monospace;
+
+  --radius: 14px;
+  --radius-lg: 22px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --shadow: 0 18px 40px rgb(3 10 18 / 45%);
+
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+html,
+body {
+  background: var(--navy-900);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  overflow: hidden; /* the scroller owns the scrolling */
+  overscroll-behavior: none;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+  margin: 0;
+  line-height: 1.02;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.app {
+  height: 100dvh;
+}
+
+/* ═══════════════════════════════════════════════════════════ SCROLLER ═══
+   The site scrolls LEFT → RIGHT at every viewport width. Each .panel is one
+   viewport wide and the track is a horizontal strip. There is deliberately no
+   vertical fallback — see useHorizontalScroll.js. */
+
+.scroller {
+  height: 100dvh;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x proximity;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  outline: none;
+  touch-action: pan-x; /* let the strip pan sideways on touch */
+  overscroll-behavior-x: contain;
+}
+
+.scroller::-webkit-scrollbar {
+  display: none;
+}
+
+.track {
+  display: flex;
+  flex-direction: row;
+  width: max-content;
+  height: 100%;
+}
+
+.panel {
+  position: relative;
+  flex: 0 0 100vw;
+  width: 100vw;
+  height: 100%;
+  scroll-snap-align: start;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(20px, 4vw, 72px) clamp(20px, 4vw, 72px) 76px;
+  overflow: hidden;
+}
+
+/* Deliberately empty panel — a full viewport of nothing, and the reason the
+   site scrolls sideways at all. Drop the next screen's markup in here. The
+   explicit background makes it read as its own blank page, distinct from the
+   blue home panel, when the strip settles on it. */
+.panel--blank {
+  background: var(--navy-900);
+}
+
+/* ═════════════════════════════════════════════════════════════ SOUND ═══ */
+
+.sound {
+  position: fixed;
+  right: clamp(14px, 3vw, 30px);
+  bottom: 16px;
+  z-index: 35;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 19px;
+  background: rgb(10 21 32 / 72%);
+  border: 1px solid rgb(255 255 255 / 14%);
+  transition:
+    transform 0.2s,
+    background 0.2s;
+}
+
+.sound:hover {
+  transform: translateY(-2px);
+  background: rgb(22 40 60 / 90%);
+}
+
+.sound.is-off {
+  opacity: 0.65;
+}
+
+.sound.is-off .sound__icon {
+  filter: grayscale(1);
+}
+
+/* ═══════════════════════════════════════════════════════════ BUTTONS ═══ */
+
+.btn {
+  --btn-bg: rgb(255 255 255 / 10%);
+  --btn-fg: var(--ink);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 22px;
+  border: 0;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--btn-fg);
+  background: var(--btn-bg);
+  transition:
+    transform 0.16s var(--ease-out),
+    box-shadow 0.2s,
+    filter 0.2s;
+  text-align: center;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn--primary {
+  --btn-fg: #1c1403;
+  background: linear-gradient(180deg, #ffd06a, var(--gold) 45%, var(--gold-deep));
+  box-shadow:
+    0 6px 0 #b0740a,
+    0 14px 26px rgb(0 0 0 / 40%);
+}
+
+.btn--primary:hover {
+  box-shadow:
+    0 8px 0 #b0740a,
+    0 18px 30px rgb(0 0 0 / 45%);
+}
+
+.btn--primary:active {
+  box-shadow: 0 2px 0 #b0740a;
+}
+
+.btn--secondary {
+  --btn-fg: #0b1a10;
+  background: linear-gradient(180deg, #a6e86a, var(--green));
+  box-shadow:
+    0 6px 0 #3f8a1f,
+    0 14px 26px rgb(0 0 0 / 35%);
+}
+
+.btn--secondary:active {
+  box-shadow: 0 2px 0 #3f8a1f;
+}
+
+.btn--ghost {
+  border: 2px solid rgb(255 255 255 / 34%);
+  background: rgb(8 16 26 / 50%);
+  backdrop-filter: blur(4px);
+}
+
+.btn--ghost:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.btn--sm {
+  padding: 9px 15px;
+  font-size: 11px;
+  border-radius: 10px;
+}
+
+.btn--lg {
+  padding: 18px 34px;
+  font-size: 15px;
+}
+
+.noscript {
+  position: fixed;
+  inset: auto 0 0 0;
+  padding: 18px;
+  background: var(--gold);
+  color: #1c1403;
+  font-weight: 600;
+  text-align: center;
+  z-index: 100;
+}
+
+/* ───────────────────────────────────────────────── reduced motion ─── */
+@media (prefers-reduced-motion: reduce) {
+  .scroller {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+/* ============================== game.css ============================== */
+/* ==========================================================================
+   Code Bounty 2.0 — game.css
+   --------------------------------------------------------------------------
+   Hero panel: the canvas stage, the world-layer zoom hand-off from the intro
+   and the HUD (level tag, drag hint, post-reveal CTA).
+
+   "THE BOUNTY GATE" is not a separate title card — it *is* the game screen.
+   ========================================================================== */
+
+.panel--hero {
+  padding: 0;
+  background: #2b78c9;
+  align-items: stretch;
+  justify-content: stretch;
+}
+
+.world-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  /* the intro hands over with a continuous zoom into the level */
+  transform: scale(1.1);
+  opacity: 0;
+  transition:
+    transform 0.9s var(--ease-out),
+    opacity 0.6s ease-out;
+}
+
+.app.is-ready .world-layer {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.stage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none; /* dragging the can must not scroll the page */
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.stage:active {
+  cursor: grabbing;
+}
+
+/* ─────────────────────────────────────────────────────────────── HUD ─── */
+
+.hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  display: block;
+}
+
+.level-tag {
+  position: absolute;
+  top: 16px;
+  left: clamp(16px, 3vw, 34px);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: rgb(10 21 32 / 55%);
+  border: 1px solid rgb(255 255 255 / 18%);
+  backdrop-filter: blur(6px);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: rgb(255 255 255 / 86%);
+  opacity: 0;
+  transform: translateY(-8px);
+  transition:
+    opacity 0.6s 0.25s var(--ease-out),
+    transform 0.6s 0.25s var(--ease-out);
+}
+
+.app.is-ready .level-tag {
+  opacity: 1;
+  transform: none;
+}
+
+.level-tag__key {
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #ffd06a, var(--gold));
+  color: #1c1403;
+  font-weight: 700;
+  font-size: 10px;
+}
+
+/* ── drag hint + skip ── */
+
+/*
+  Both HUD blocks stay mounted and are toggled with .is-in so their enter
+  transition can actually play. `visibility` (with a delayed transition) keeps
+  a hidden hint out of the tab order and off the pointer while it is away —
+  .hud is pointer-events:none, so .hint > * would otherwise stay clickable.
+*/
+.hint {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(64px, 11vh, 104px);
+  transform: translate(-50%, 14px);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.4s var(--ease-out),
+    transform 0.4s var(--ease-out),
+    visibility 0s linear 0.4s;
+}
+
+.hint.is-in {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+  transition-delay: 0s;
+}
+
+.hint > * {
+  pointer-events: auto;
+}
+
+.hint__bubble {
+  position: relative;
+  padding: 12px 18px;
+  border-radius: 14px;
+  background: rgb(10 21 32 / 72%);
+  border: 1px solid rgb(255 255 255 / 18%);
+  backdrop-filter: blur(6px);
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: #fff;
+  white-space: nowrap;
+  animation: bob 2.4s ease-in-out infinite;
+}
+
+.hint__bubble::after {
+  content: '';
+  position: absolute;
+  left: 26px;
+  bottom: -8px;
+  width: 16px;
+  height: 16px;
+  background: rgb(10 21 32 / 72%);
+  border-right: 1px solid rgb(255 255 255 / 18%);
+  border-bottom: 1px solid rgb(255 255 255 / 18%);
+  transform: rotate(45deg);
+}
+
+.hint__arrow {
+  color: var(--gold);
+  margin-left: 4px;
+}
+
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+/* ── post-reveal CTA ── */
+
+.hero-cta {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(60px, 10vh, 96px);
+  transform: translate(-50%, 18px);
+  width: min(760px, 92vw);
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.5s var(--ease-out),
+    transform 0.5s var(--ease-out),
+    visibility 0s linear 0.5s;
+}
+
+.hero-cta.is-in {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+  transition-delay: 0s;
+}
+
+.hero-cta.is-in > * {
+  pointer-events: auto;
+}
+
+.hero-cta__kicker {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.34em;
+  color: var(--gold);
+  margin-bottom: 6px;
+}
+
+.hero-cta__title {
+  font-family: var(--font-display);
+  font-size: clamp(18px, 3vw, 30px);
+  letter-spacing: 0.04em;
+  color: #fff;
+  text-shadow:
+    0 4px 0 rgb(0 0 0 / 35%),
+    0 12px 26px rgb(0 0 0 / 50%);
+  margin-bottom: 16px;
+}
+
+.hero-cta__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+@media (max-width: 620px) {
+  .hint {
+    flex-direction: column;
+    gap: 10px;
+    bottom: 78px;
+  }
+
+  .hint__bubble {
+    font-size: 11px;
+    padding: 10px 14px;
+  }
+
+  .hero-cta__row .btn {
+    width: 100%;
+  }
+}
+
+
+/* ============================== intro.css ============================== */
+/* ==========================================================================
+   INTRO — the cutscene
+   --------------------------------------------------------------------------
+   Just the video full-bleed, a light scrim so the SKIP button stays readable,
+   and the yellow SKIP button bottom-right. It fades + zooms away into the
+   level rather than cutting.
+
+   No logo animation, no word assembly, no tagline, no loading bar — the
+   cutscene is the whole intro.
+   ========================================================================== */
+
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  background: #060c14;
+  overflow: hidden;
+  transform-origin: 50% 50%;
+}
+
+/* ───────────────────────────────────────────────────────────── video ─── */
+
+.intro__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* fill the screen whatever the aspect ratio */
+  background: #060c14;
+  transform: scale(1.02);
+  animation: introDrift 24s ease-in-out infinite alternate;
+}
+
+@keyframes introDrift {
+  from {
+    transform: scale(1.02);
+  }
+
+  to {
+    transform: scale(1.09);
+  }
+}
+
+/* a soft edge darkening so the cutscene does not fight the SKIP button */
+.intro__scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(130% 100% at 50% 45%, rgb(6 12 20 / 0%) 45%, rgb(6 12 20 / 55%) 100%),
+    linear-gradient(
+      180deg,
+      rgb(6 12 20 / 35%) 0%,
+      rgb(6 12 20 / 0%) 22%,
+      rgb(6 12 20 / 0%) 70%,
+      rgb(6 12 20 / 45%) 100%
+    );
+}
+
+/* ────────────────────────────────────────────────────────────── exit ─── */
+
+.intro.is-leaving {
+  animation: introOut 0.8s cubic-bezier(0.5, 0, 0.75, 0) forwards;
+  /* the overlay fades out over ~0.8s — stop it eating drags on the slingshot */
+  pointer-events: none;
+}
+
+.intro.is-leaving.is-instant {
+  animation-duration: 0.4s;
+}
+
+@keyframes introOut {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+
+  60% {
+    opacity: 0.55;
+    filter: blur(2px);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.14);
+    filter: blur(6px);
+  }
+}
+
+/* ────────────────────────────────────────────────────────────── skip ─── */
+
+.intro__skip {
+  position: absolute;
+  right: clamp(16px, 4vw, 46px);
+  bottom: clamp(16px, 4vh, 42px);
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px 24px;
+  border: 0;
+  border-radius: 14px;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 14px;
+  letter-spacing: 0.16em;
+  color: #1c1403;
+  background: linear-gradient(180deg, #ffd06a, var(--gold) 48%, var(--gold-deep));
+  box-shadow:
+    0 6px 0 #a86d07,
+    0 16px 30px rgb(0 0 0 / 45%);
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.4s var(--ease-out),
+    transform 0.4s var(--ease-out),
+    filter 0.15s;
+}
+
+/* the class goes on the *button* (.intro__skip.show-skip), not the overlay */
+.intro__skip.show-skip {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.intro__skip:hover {
+  filter: brightness(1.07);
+  transform: translateY(-2px);
+}
+
+.intro__skip:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 #a86d07;
+}
+
+.intro__skip:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+
+.intro__skip svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: #1c1403;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.2s;
+}
+
+.intro__skip:hover svg {
+  transform: translateX(4px);
+}
+
+@media (max-width: 640px) {
+  .intro__skip {
+    padding: 13px 18px;
+    font-size: 12px;
+  }
+}
